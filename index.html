@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>서진캠 작업허가 신청</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column for phones (worker form), widening to a list + detail pane for the admin desk. */
+:root {
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --sunk: #eceef3;
+  --line: #d8dbe4;
+  --fg: #161a26;
+  --muted: #5b6275;
+  --accent: #23366e;
+  --accent-ink: #ffffff;
+  --high: #c2410c;
+  --high-soft: #fde9dd;
+  --gen: #1e6f6c;
+  --gen-soft: #dcf0ee;
+  --ok: #2f7a3b;
+  --warn-soft: #fff4d6;
+  --tape-a: #f2c230;
+  --tape-b: #1b1d22;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10131b; --surface: #181c27; --sunk: #141824; --line: #2b3144; --fg: #e8eaf1; --muted: #9ba3b9;
+    --accent: #8fa6ff; --accent-ink: #0d1122; --high: #ff8f57; --high-soft: #3a2116; --gen: #5fcbc4; --gen-soft: #14302e;
+    --ok: #7fd18b; --warn-soft: #33290f; --tape-a: #e0b52b; --tape-b: #0b0c0f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10131b; --surface: #181c27; --sunk: #141824; --line: #2b3144; --fg: #e8eaf1; --muted: #9ba3b9;
+  --accent: #8fa6ff; --accent-ink: #0d1122; --high: #ff8f57; --high-soft: #3a2116; --gen: #5fcbc4; --gen-soft: #14302e;
+  --ok: #7fd18b; --warn-soft: #33290f; --tape-a: #e0b52b; --tape-b: #0b0c0f; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.tape { height: 6px; background: repeating-linear-gradient(-45deg, var(--tape-a) 0 10px, var(--tape-b) 10px 20px); }
+.wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 48px; }
+.wrap.wide { max-width: 1180px; }
+header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.org { font-size: 12px; letter-spacing: .06em; color: var(--muted); }
+h1 { font-size: 24px; line-height: 1.25; margin: 2px 0 0; font-weight: 700; text-wrap: balance; }
+h2 { font-size: 17px; margin: 0; font-weight: 700; }
+.tabs { display: flex; gap: 4px; background: var(--sunk); padding: 4px; border-radius: 999px; border: 1px solid var(--line); }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, label.chip:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.notice { border: 1px solid var(--line); background: var(--warn-soft); border-radius: var(--r); padding: 12px 14px; font-size: 14px; margin-bottom: 16px; }
+.intro { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+form { display: grid; gap: 14px; }
+fieldset { margin: 0; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 16px; display: grid; gap: 14px; min-width: 0; }
+legend { float: left; width: 100%; padding: 0; margin-bottom: 2px; font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: baseline; }
+legend .step { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+legend + * { clear: both; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.field { display: grid; gap: 5px; min-width: 0; }
+.field > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.field > span b { color: var(--high); font-weight: 700; }
+.hint { font-size: 12.5px; color: var(--muted); }
+input[type="text"], input[type="tel"], input[type="date"], input[type="time"], input[type="number"], input[type="password"], input[type="search"], select, textarea {
+  width: 100%; font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0;
+}
+textarea { min-height: 92px; resize: vertical; }
+input:user-invalid, textarea:user-invalid { border-color: var(--high); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+label.chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; font-size: 14px; user-select: none; }
+label.chip input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+label.chip:has(input:checked) { border-color: var(--accent); background: var(--sunk); font-weight: 600; }
+.hazards { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+label.hz { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; }
+label.hz input { grid-row: span 2; margin-top: 4px; width: 16px; height: 16px; accent-color: var(--high); }
+label.hz strong { font-size: 14px; }
+label.hz small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+label.hz:has(input:checked) { border-color: var(--high); background: var(--high-soft); }
+.subhead { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+
+.verdict { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 8px; font-size: 14px; border: 1px solid; }
+.verdict.gen { background: var(--gen-soft); border-color: var(--gen); color: var(--fg); }
+.verdict.high { background: var(--high-soft); border-color: var(--high); color: var(--fg); }
+.verdict .tag { font-weight: 700; white-space: nowrap; }
+.verdict.gen .tag { color: var(--gen); }
+.verdict.high .tag { color: var(--high); }
+
+.radios { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 14px; }
+.radios label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.radios input { accent-color: var(--accent); }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+.consent input { margin-top: 4px; accent-color: var(--accent); width: 16px; height: 16px; }
+
+.btn { font: inherit; font-weight: 600; font-size: 15px; border-radius: 8px; padding: 11px 18px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { font-size: 13px; padding: 7px 12px; }
+.btn.danger { color: var(--high); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.err { color: var(--high); font-size: 14px; }
+
+.done { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; display: grid; gap: 12px; }
+.done .big { font-size: 20px; font-weight: 700; }
+dl.kv { display: grid; grid-template-columns: 110px 1fr; gap: 6px 12px; margin: 0; font-size: 14px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.mine { margin-top: 28px; display: grid; gap: 8px; }
+.mine ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mine li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 14px; }
+
+.badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.badge.high { background: var(--high-soft); color: var(--high); }
+.badge.gen { background: var(--gen-soft); color: var(--gen); }
+.badge.printed { background: var(--sunk); color: var(--ok); }
+.badge.new { background: var(--sunk); color: var(--muted); }
+.badge.ext { background: var(--warn-soft); color: var(--fg); border: 1px solid var(--tape-a); }
+.mine li .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.extlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.extlist li { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13.5px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 13px; }
+
+/* admin */
+.gate { max-width: 340px; margin: 40px auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 24px; display: grid; gap: 14px; text-align: center; }
+.pin { font-family: var(--font-mono); letter-spacing: .5em; text-align: center; font-size: 22px !important; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 12px; color: var(--muted); }
+.stat.high .n { color: var(--high); } .stat.gen .n { color: var(--gen); }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.toolbar input[type="search"] { flex: 1 1 200px; width: auto; padding: 8px 12px; font-size: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); font: inherit; font-size: 13px; padding: 7px 11px; cursor: pointer; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--sunk); color: var(--fg); font-weight: 700; }
+.desk { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; align-items: start; }
+.tablebox { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--sunk); white-space: nowrap; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--sunk); }
+tbody tr.sel { background: var(--sunk); box-shadow: inset 3px 0 0 var(--accent); }
+td.desc { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td input { accent-color: var(--accent); width: 16px; height: 16px; }
+.empty { padding: 36px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.panel .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.qrbox { display: grid; gap: 10px; justify-items: center; text-align: center; }
+#qr { background: #ffffff; padding: 12px; border-radius: 8px; line-height: 0; }
+#qr img, #qr canvas { width: 180px; height: 180px; }
+.urlline { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; user-select: all; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 14px; z-index: 10; max-width: calc(100% - 32px); }
+@media (max-width: 900px) { .desk { grid-template-columns: minmax(0, 1fr); } .panel { position: static; } }
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } dl.kv { grid-template-columns: 90px 1fr; } }
+@media (prefers-reduced-motion: no-preference) { .btn, label.chip, label.hz { transition: border-color .15s, background-color .15s; } }
+</style>
+<style>
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+.receipt { display: flex; gap: 12px; align-items: baseline; padding: 12px 14px; border: 1px dashed var(--line); border-radius: 8px; background: var(--sunk); }
+.receipt span { font-size: 13px; color: var(--muted); }
+.receipt b { font-size: 24px; letter-spacing: .14em; }
+.lookup { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--surface); font-size: 14px; }
+.lookup summary { cursor: pointer; font-weight: 600; }
+.lookup .grid { margin: 12px 0; }
+.hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+</style>
+</head>
+<body>
+
+<div class="tape" aria-hidden="true"></div>
+<div class="wrap" id="wrap">
+  <header class="top">
+    <div>
+      <div class="org">㈜서진캠 평택공장 · 총무/안전관리팀</div>
+      <h1 id="pageTitle">작업허가 신청</h1>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabForm" aria-selected="true">작업 신청</button>
+      <button role="tab" id="tabAdmin" aria-selected="false">관리자</button>
+    </div>
+  </header>
+
+  <!-- ============ WORKER ============ -->
+  <section id="viewForm">
+    <div class="notice" id="writeNotice" hidden></div>
+    <p class="intro">사내에서 공사·작업을 하기 전에 작성해 주세요. 고위험작업(밀폐공간·정전·화기·고소·굴착·중장비)이 하나라도 있으면 고위험작업 허가서로, 나머지는 일반위험작업 허가서로 접수됩니다.</p>
+
+    <form id="permitForm" novalidate>
+      <fieldset>
+        <legend><span class="step">1/5</span> 업체·신청인</legend>
+        <label class="field"><span>업체명 (해당부서) <b>*</b></span><input type="text" id="company" required autocomplete="organization" placeholder="예: ○○설비(주)"></label>
+        <div class="grid">
+          <label class="field"><span>신청인 소속(부서) <b>*</b></span><input type="text" id="applicantDept" required placeholder="예: 공무팀"></label>
+          <label class="field"><span>직책</span><input type="text" id="applicantTitle" placeholder="예: 현장소장"></label>
+          <label class="field"><span>신청인 성명 <b>*</b></span><input type="text" id="applicantName" required autocomplete="name"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2/5</span> 일정·장소·작업자</legend>
+        <div class="grid">
+          <label class="field"><span>작업 시작일 <b>*</b></span><input type="date" id="startDate" required></label>
+          <label class="field"><span>작업 종료일 <b>*</b></span><input type="date" id="endDate" required></label>
+          <label class="field"><span>작업 시간</span><input type="text" id="workHours" placeholder="예: 08:00~17:00"></label>
+        </div>
+        <label class="field"><span>작업지역(장소) <b>*</b></span><input type="text" id="location" required placeholder="예: 소결동 2층 집진기 주변"></label>
+        <div class="grid">
+          <label class="field"><span>작업자 성명 <b>*</b></span><input type="text" id="workerNames" required placeholder="예: 홍길동 외 2명"></label>
+          <label class="field"><span>작업자 연락처 <b>*</b></span><input type="tel" id="workerPhone" required inputmode="tel" placeholder="010-0000-0000" pattern="[0-9\-\s]{9,14}"></label>
+          <label class="field"><span>작업 인원(명)</span><input type="number" id="headcount" min="1" max="999" inputmode="numeric"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3/5</span> 작업 종류</legend>
+        <div class="subhead">고위험작업 — 해당되는 것을 모두 고르세요</div>
+        <div class="hazards" id="hazardList"></div>
+        <label class="field" id="heavyEquipWrap" hidden><span>투입 장비 <b>*</b></span><input type="text" id="heavyEquip" placeholder="예: 25톤 크레인 1대, 지게차 1대"></label>
+        <div class="subhead">일반 작업 구분</div>
+        <div class="chips" id="genList"></div>
+        <label class="field" id="otherTypeWrap" hidden><span>기타 작업명</span><input type="text" id="otherType" placeholder="예: 도장작업"></label>
+        <div class="verdict gen" id="verdict" aria-live="polite"><span class="tag">일반위험작업</span><span id="verdictText">허가서로 접수됩니다.</span></div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">4/5</span> 작업 내용</legend>
+        <label class="field"><span>작업 내용 <b>*</b></span><textarea id="description" required maxlength="160" placeholder="무엇을, 어떤 방법으로 하는지 적어 주세요. 예: 2층 배관 교체를 위해 기존 배관 절단(그라인더) 후 신규 배관 용접"></textarea></label>
+        <label class="field"><span>기타사항</span><input type="text" id="notes" placeholder="안전관리자에게 전달할 내용"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">5/5</span> 첨부서류·위험성평가</legend>
+        <div class="subhead">준비한 서류 (해당 시 체크)</div>
+        <div class="chips" id="attachList"></div>
+        <div class="field"><span>작업절차서</span>
+          <div class="radios"><label><input type="radio" name="procedureDoc" value="유"> 있음</label><label><input type="radio" name="procedureDoc" value="무" checked> 없음</label></div>
+        </div>
+        <div class="field"><span>평소와 다른 작업(변경 작업)인가요?</span>
+          <div class="radios"><label><input type="radio" name="changedWork" value="유"> 예</label><label><input type="radio" name="changedWork" value="무" checked> 아니요</label></div>
+        </div>
+        <label class="consent"><input type="checkbox" id="consent" required><span>작업허가 관리를 위해 성명·연락처를 수집하는 데 동의합니다. 작업 종료 후 허가서 보존기간 동안만 보관합니다.</span></label>
+      </fieldset>
+
+      <input class="hp" type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="actions">
+        <button class="btn primary" type="submit" id="submitBtn">작업허가 신청</button>
+        <span class="err" id="formErr" role="alert"></span>
+      </div>
+    </form>
+
+    <div class="done" id="doneCard" hidden>
+      <div class="big">신청이 접수되었습니다</div>
+      <div class="receipt"><span>접수번호</span><b id="doneId" class="mono"></b></div>
+      <p class="hint" style="margin:0">작업이 길어져 연장을 신청할 때 필요합니다. 캡처하거나 메모해 두세요. 이 휴대폰에서는 아래 '내가 신청한 작업'에 자동으로 남습니다.</p>
+      <div id="doneVerdict"></div>
+      <dl class="kv" id="doneKv"></dl>
+      <p class="hint">허가서는 총무/안전관리팀에서 출력해 서명을 받습니다. 작업 전 안전관리팀의 확인을 받으세요.</p>
+      <div class="actions"><button class="btn" type="button" id="againBtn">다른 작업 신청</button></div>
+    </div>
+
+    <div class="done" id="extCard" hidden>
+      <div class="big">작업 연장 신청</div>
+      <dl class="kv" id="extKv"></dl>
+      <div class="grid">
+        <label class="field"><span>연장 일자 <b>*</b></span><input type="date" id="extDate"></label>
+        <label class="field"><span>시작 시각 <b>*</b></span><input type="time" id="extFrom" value="17:00"></label>
+        <label class="field"><span>종료 시각 <b>*</b></span><input type="time" id="extTo" value="20:00"></label>
+      </div>
+      <label class="field"><span>연장 사유 <b>*</b></span><input type="text" id="extReason" maxlength="80" placeholder="예: 덕트 용접 잔여분 마무리"></label>
+      <p class="hint" style="margin:0">허가서의 '작업연장 허가' 줄에 들어갑니다. 연장 작업 전에 총무/안전관리팀의 확인을 받으세요.</p>
+      <div class="actions"><button class="btn primary" type="button" id="extSave">연장 신청</button><button class="btn" type="button" id="extCancel">취소</button><span class="err" id="extErr" role="alert"></span></div>
+    </div>
+
+    <div class="mine" id="mine" hidden>
+      <h2>내가 신청한 작업</h2>
+      <p class="hint" style="margin:0">이 휴대폰에서 신청한 작업입니다. 작업이 길어지면 '연장 신청'을 눌러 주세요. 새로 신청하지 않아도 같은 허가서에 연장이 기록됩니다.</p>
+      <ul id="mineList"></ul>
+    </div>
+    <details class="lookup" id="lookupBox">
+      <summary>다른 휴대폰에서 신청했나요? 접수번호로 찾기</summary>
+      <div class="grid">
+        <label class="field"><span>접수번호</span><input type="text" id="lookupId" maxlength="8" autocapitalize="characters" autocomplete="off" placeholder="예: 7F3A9C"></label>
+        <label class="field"><span>신청 때 적은 연락처</span><input type="tel" id="lookupPhone" inputmode="tel" placeholder="010-0000-0000"></label>
+      </div>
+      <div class="actions"><button class="btn small" type="button" id="lookupBtn">찾기</button><span class="err" id="lookupErr" role="alert"></span></div>
+    </details>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section id="viewAdmin" hidden>
+    <div class="gate" id="gate">
+      <h2>관리자 확인</h2>
+      <p class="hint" style="margin:0">신청 목록과 허가서 출력은 관리자만 할 수 있습니다. 관리자 비밀번호를 입력하세요.</p>
+      <input type="password" id="pin" autocomplete="current-password" aria-label="관리자 비밀번호">
+      <button class="btn primary" type="button" id="pinBtn">확인</button>
+      <span class="err" id="pinErr" role="alert"></span>
+    </div>
+
+    <div id="desk" hidden>
+      <div class="notice" id="adminNotice" hidden></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="sAll">0</div><div class="l">전체 신청</div></div>
+        <div class="stat high"><div class="n" id="sHigh">0</div><div class="l">고위험작업</div></div>
+        <div class="stat gen"><div class="n" id="sGen">0</div><div class="l">일반위험작업</div></div>
+        <div class="stat"><div class="n" id="sTodo">0</div><div class="l">미출력</div></div>
+      </div>
+      <div class="toolbar">
+        <div class="seg" id="kindSeg">
+          <button type="button" data-v="all" aria-pressed="true">전체</button>
+          <button type="button" data-v="high" aria-pressed="false">고위험</button>
+          <button type="button" data-v="gen" aria-pressed="false">일반</button>
+        </div>
+        <div class="seg" id="statSeg">
+          <button type="button" data-v="all" aria-pressed="true">모두</button>
+          <button type="button" data-v="todo" aria-pressed="false">미출력</button>
+          <button type="button" data-v="printed" aria-pressed="false">출력완료</button>
+          <button type="button" data-v="ext" aria-pressed="false">연장신청</button>
+        </div>
+        <input type="search" id="q" placeholder="업체·장소·작업자 검색">
+        <button class="btn small primary" type="button" id="xlsxBtn" disabled>선택 0건 엑셀 받기</button>
+        <button class="btn small" type="button" id="refreshBtn">새로고침</button>
+        <button class="btn small" type="button" id="lockBtn">잠금</button>
+      </div>
+      <div class="desk">
+        <div class="tablebox">
+          <table>
+            <thead><tr>
+              <th><input type="checkbox" id="checkAll" aria-label="전체 선택"></th>
+              <th>접수</th><th>구분</th><th>업체</th><th>작업장소</th><th>작업기간</th><th>작업내용</th><th>상태</th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="emptyRows">아직 접수된 작업허가 신청이 없습니다.<br>작업자가 QR 코드로 신청하면 여기에 쌓입니다.</div>
+        </div>
+        <aside class="panel" id="side">
+          <div id="detail" hidden></div>
+          <div class="qrbox" id="qrPanel">
+            <h2>작업자용 QR 코드</h2>
+            <div id="qr" aria-label="신청 페이지 QR 코드"></div>
+            <div class="urlline" id="qrUrl"></div>
+            <div class="row" style="justify-content:center">
+              <button class="btn small" type="button" id="qrSave">QR 이미지 받기</button>
+              <button class="btn small" type="button" id="urlCopy">링크 복사</button>
+            </div>
+            <p class="hint" style="margin:0">출입구·안전교육장에 붙여 두세요. 직원은 가입이나 앱 설치 없이 바로 신청할 수 있습니다.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script>
+/* PERMIT_FILL_START */
+/* 작업허가서 엑셀 채우기 — 양식 파일의 XML에 값만 끼워 넣는다(서식·글꼴·테두리는 손대지 않음). */
+const HIGH_TYPES = [
+  { key: 'confined', label: '밀폐공간', row: 20, period: 21 },
+  { key: 'power',    label: '정전',     row: 22, period: 25 },
+  { key: 'hot',      label: '화기',     row: 27, period: 28 },
+  { key: 'height',   label: '고소',     row: 29, period: 30 },
+  { key: 'dig',      label: '굴착',     row: 31, period: null },
+  { key: 'heavy',    label: '중장비',   row: 33, period: 35 },
+];
+const GEN_TYPES = [
+  { key: 'install', label: '설비 설치/해체작업', token: '□ 설비 설치/해체작업' },
+  { key: 'repair',  label: '건물수선작업',       token: '□ 건물수선작업' },
+  { key: 'self',    label: '자체작업',           token: '□ 자체자업' },
+  { key: 'env',     label: '환경관련작업',       token: '□ 환경관련작업' },
+];
+const ATTACH = {
+  high: ['작업계획서', '소화기목록', '특수작업절차서', '기술자료(도면)', '안전장구 목록', '굴착도면'],
+  gen:  ['작업계획서', '소화기목록', '산재보험', '기술자료(도면)', '안전장구 목록'],
+};
+const CHECKED = '■';
+
+function permitIsHigh(p) {
+  if (p.override === 'high') return true;
+  if (p.override === 'gen') return false;
+  return (p.highTypes || []).length > 0;
+}
+
+const _xmlEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\r?\n/g, '&#10;');
+const _xmlDec = (s) => s.replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCodePoint(parseInt(h, 16)))
+  .replace(/&#(\d+);/g, (m, d) => String.fromCodePoint(+d))
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+const _cellRe = (addr) => new RegExp(`<c r="${addr}"(?=[\\s>/])[^>]*?(?:/>|>[\\s\\S]*?</c>)`);
+
+function _getText(xml, addr) {
+  const m = xml.match(_cellRe(addr));
+  if (!m) return '';
+  return [...m[0].matchAll(/<t[^>]*>([\s\S]*?)<\/t>/g)].map(x => _xmlDec(x[1])).join('');
+}
+
+function _setCell(xml, addr, value) {
+  const re = _cellRe(addr);
+  const m = xml.match(re);
+  if (!m) throw new Error('양식에 셀이 없습니다: ' + addr);
+  const s = (m[0].match(/\ss="(\d+)"/) || [])[1];
+  const sAttr = s ? ` s="${s}"` : '';
+  let cell;
+  if (value === null || value === undefined || value === '') cell = `<c r="${addr}"${sAttr}/>`;
+  else if (typeof value === 'number') cell = `<c r="${addr}"${sAttr}><v>${value}</v></c>`;
+  else cell = `<c r="${addr}"${sAttr} t="inlineStr"><is><t xml:space="preserve">${_xmlEsc(value)}</t></is></c>`;
+  return xml.replace(re, cell);
+}
+
+/* 화면 폭 근사: 한글·전각 2, 그 외 1 (11pt 기준 D~M 한 줄 ≈ 84) */
+function _w(str) { let w = 0; for (const ch of str) w += /[\u1100-\u11ff\u3000-\u9fff\uac00-\ud7af\uff00-\uffef]/.test(ch) ? 2 : 1; return w; }
+function _cut(str, max) { let w = 0, out = ''; for (const ch of str) { const cw = _w(ch); if (w + cw > max) return [out, str.slice(out.length)]; w += cw; out += ch; } return [out, '']; }
+function _lines(str, max, n) {
+  const res = []; let rest = (str || '').trim();
+  while (rest && res.length < n) { const [a, b] = _cut(rest, max); res.push(a); rest = b.trim(); }
+  if (rest && res.length) res[res.length - 1] = _cut(res[res.length - 1], max - 2)[0] + '…';
+  return res;
+}
+const LINE = 84;
+
+function _mmdd(d) { if (!d) return ''; const [, m, day] = d.split('-'); return `${+m}.${+day}`; }
+
+function fillPermitXml(xml, p) {
+  const high = permitIsHigh(p);
+  const set = (a, v) => { xml = _setCell(xml, a, v); };
+  const box = (on) => (on ? CHECKED : '□');
+
+  // 신청인
+  set('E6', p.applicantDept || '');
+  set('H6', p.applicantTitle || '');
+  set('K6', p.applicantName || '');
+  // 작업허가기간: E7=연도(오른쪽 정렬) | F7='년  월숫자' | G7='월  일숫자' | H7='일부터'
+  const [sy, sm, sd] = (p.startDate || '').split('-').map(Number);
+  const [ey, em, ed] = (p.endDate || '').split('-').map(Number);
+  const pad = (n) => String(n).padStart(2, ' ');
+  if (sy) { set('E7', sy); set('F7', `년     ${pad(sm)}`); set('G7', `월     ${pad(sd)}`); }
+  if (ey) { set('I7', ey); set('J7', `년     ${pad(em)}`); set('K7', `월     ${pad(ed)}`); }
+  // 작업장소 · 작업자
+  set('F8', p.company || '');
+  set('K8', p.location || '');
+  set('F9', p.workerNames || '');
+  set('K9', p.workerPhone || '');
+
+  // 첨부서류: 해당 항목의 □만 ■로
+  const att = new Set(p.attachments || []);
+  let t11 = _getText(xml, 'D11');
+  (high ? ATTACH.high : ATTACH.gen).forEach(n => { if (att.has(n)) t11 = t11.replace('□ ' + n, CHECKED + ' ' + n); });
+  set('D11', t11);
+  // 위험성평가: 원문 그대로, 선택한 □만 ■로
+  let t12 = _getText(xml, 'D12');
+  t12 = t12.replace(/□\s?유(\s+□\s?무)/, (m, rest) => (p.procedureDoc === '유' ? m.replace('□', CHECKED) : p.procedureDoc === '무' ? m.replace(rest, rest.replace('□', CHECKED)) : m));
+  t12 = t12.replace(/(작업상이\s+)□(\s?유\s+)□/, (m, a, b) => a + box(p.changedWork === '유') + b + box(p.changedWork === '무'));
+  set('D12', t12);
+
+  // 작업연장 허가 줄 (연장 신청이 있으면 그 건을 채움)
+  const ext = p.extension;
+  if (ext && ext.date) {
+    const r = high ? 46 : 44;
+    const [xy, xm, xd] = ext.date.split('-').map(Number);
+    const hh = (t, unit) => { if (!t) return unit; const [h, m] = t.split(':').map(Number); return m ? `${h}:${String(m).padStart(2, '0')} ${unit.slice(1)}` : `${h} ${unit}`; };
+    set('D' + r, `  ${xy}  년`);
+    set('E' + r, `${xm}  월`);
+    set('F' + r, `${xd}  일`);
+    set('G' + r, hh(ext.from, '시부터'));
+    set('H' + r, hh(ext.to, '시까지'));
+  }
+
+  const period = `${_mmdd(p.startDate)} ~ ${_mmdd(p.endDate)}`;
+  const timeLine = [p.workHours ? `작업시간 ${p.workHours}` : '', p.headcount ? `작업인원 ${p.headcount}명` : ''].filter(Boolean).join('   /   ');
+
+  if (high) {
+    const types = p.highTypes || [];
+    const labels = HIGH_TYPES.filter(h => types.includes(h.key)).map(h => h.label);
+    const head = labels.length ? `[${labels.join('·')}] ` : '';
+    const desc = (p.description || '').trim();
+    let d10 = head + desc, more = '';
+    if (_w(d10) > 100) { const [a, b] = _cut(d10, 80); d10 = a + ' …(기타사항 계속)'; more = b.trim(); }
+    set('D10', d10);
+    HIGH_TYPES.forEach(h => {
+      const on = types.includes(h.key);
+      set('B' + h.row, box(on));
+      if (!on) return;
+      if (h.period) { set('F' + h.period, _mmdd(p.startDate)); set('H' + h.period, _mmdd(p.endDate)); }
+      else set('J32', period);
+    });
+    if (types.includes('heavy')) set('F33', p.heavyEquip || '');
+    // 기타사항 칸은 2줄
+    const tail = [timeLine, p.notes || ''].filter(Boolean).join('   /   ');
+    const box40 = more ? _lines('(작업내용 계속) ' + more, LINE, tail ? 1 : 2).concat(tail ? _lines(tail, LINE, 1) : []) : _lines(tail, LINE, 2);
+    set('D40', box40.join('\n'));
+  } else {
+    let t10 = _getText(xml, 'D10');
+    const g = new Set(p.genTypes || []);
+    GEN_TYPES.forEach(x => { if (g.has(x.key)) t10 = t10.replace(x.token, CHECKED + x.token.slice(1)); });
+    if (g.has('other')) t10 = t10.replace(/□ 기타 \((\s*)\)/, (m, sp) => `${CHECKED} 기타 ( ${p.otherType || ''} )`);
+    set('D10', t10);
+    // 기타사항 칸은 3줄: 작업내용 최대 2줄 + 시간·인원·비고 1줄
+    const tail = [timeLine, p.notes || ''].filter(Boolean).join('   /   ');
+    const box37 = _lines(`작업내용 : ${p.description || ''}`, LINE, tail ? 2 : 3).concat(tail ? _lines(tail, LINE, 1) : []);
+    set('D37', box37.join('\n'));
+  }
+  return xml;
+}
+
+function _sheetName(p, used) {
+  const kind = permitIsHigh(p) ? '고위험' : '일반';
+  const co = (p.company || '업체').replace(/[\[\]:*?\/\\']/g, '').slice(0, 14);
+  const d = (p.startDate || '').slice(5).replace('-', '');
+  let base = `${kind}_${co}_${d}`.slice(0, 28), name = base, n = 2;
+  while (used.has(name)) name = base.slice(0, 26) + '_' + n++;
+  used.add(name);
+  return name;
+}
+
+/** 허가서 여러 건 → 한 통합문서(건마다 시트 1장). JSZip 전역 필요. */
+async function buildPermitWorkbook(_unused, templateBuf, permits) {
+  const zip = await JSZip.loadAsync(templateBuf);
+  const read = (p) => zip.file(p).async('string');
+  const wbXml = await read('xl/workbook.xml');
+  const relsXml = await read('xl/_rels/workbook.xml.rels');
+  const ctXml = await read('[Content_Types].xml');
+
+  // 양식 시트 두 장(0=고위험, 1=일반)의 경로·인쇄영역
+  const sheetTags = [...wbXml.matchAll(/<sheet [^>]*?r:id="([^"]+)"[^>]*\/>/g)];
+  const relTarget = (id) => (relsXml.match(new RegExp(`<Relationship[^>]*Id="${id}"[^>]*>`)) || [''])[0].match(/Target="([^"]+)"/)[1];
+  const norm = (t) => t.replace(/^\//, '').replace(/^(?!xl\/)/, 'xl/');
+  const tplPath = sheetTags.map(m => norm(relTarget(m[1])));
+  const areas = [0, 1].map(i => (wbXml.match(new RegExp(`<definedName name="_xlnm.Print_Area" localSheetId="${i}">[^!]*!([^<]+)</definedName>`)) || [, '$A$1:$N$47'])[1]);
+  const tpl = [];
+  for (let i = 0; i < 2; i++) {
+    const path = tplPath[i];
+    const relPath = path.replace('worksheets/', 'worksheets/_rels/') + '.rels';
+    const sheet = await read(path);
+    const srels = zip.file(relPath) ? await read(relPath) : '';
+    const dTarget = (srels.match(/relationships\/drawing" Target="([^"]+)"/) || srels.match(/Target="([^"]+drawing[^"]*)"/) || [])[1];
+    const dPath = dTarget ? (dTarget.startsWith('/') ? dTarget.slice(1) : 'xl/' + dTarget.replace(/^\.\.\//, '')) : null;
+    const dRelPath = dPath ? dPath.replace('drawings/', 'drawings/_rels/') + '.rels' : null;
+    tpl.push({ sheet, drawing: dPath ? await read(dPath) : null, drawingRels: dRelPath && zip.file(dRelPath) ? await read(dRelPath) : null, area: areas[i] });
+    [path, relPath, dPath, dRelPath].forEach(f => f && zip.remove(f));
+  }
+
+  const used = new Set(), sheets = [], names = [], rels = [], overrides = [];
+  permits.forEach((p, i) => {
+    const t = tpl[permitIsHigh(p) ? 0 : 1];
+    const n = i + 1, name = _sheetName(p, used);
+    let xml = fillPermitXml(t.sheet, p);
+    xml = xml.replace(/<sheetView([^>]*?)\stabSelected="1"/, '<sheetView$1').replace(/<sheetView /, i === 0 ? '<sheetView tabSelected="1" ' : '<sheetView ');
+    zip.file(`xl/worksheets/sheet${n}.xml`, xml);
+    if (t.drawing) {
+      zip.file(`xl/drawings/drawing${n}.xml`, t.drawing);
+      if (t.drawingRels) zip.file(`xl/drawings/_rels/drawing${n}.xml.rels`, t.drawingRels.replace(/Target="\.\.\//g, 'Target="/xl/'));
+      const drawId = (xml.match(/<drawing [^>]*r:id="([^"]+)"/) || [, 'rId1'])[1];
+      zip.file(`xl/worksheets/_rels/sheet${n}.xml.rels`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="${drawId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="/xl/drawings/drawing${n}.xml"/></Relationships>`);
+      overrides.push(`<Override PartName="/xl/drawings/drawing${n}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`);
+    }
+    xml.match(/<legacyDrawing|<pageSetup[^>]*r:id/) && zip.file(`xl/worksheets/sheet${n}.xml`, xml.replace(/(<pageSetup[^>]*?)\sr:id="[^"]*"/, '$1'));
+    sheets.push(`<sheet name="${_xmlEsc(name)}" sheetId="${n}" r:id="rIdPermit${n}"/>`);
+    names.push(`<definedName name="_xlnm.Print_Area" localSheetId="${i}">'${_xmlEsc(name.replace(/'/g, "''"))}'!${t.area}</definedName>`);
+    rels.push(`<Relationship Id="rIdPermit${n}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="/xl/worksheets/sheet${n}.xml"/>`);
+    overrides.push(`<Override PartName="/xl/worksheets/sheet${n}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`);
+  });
+
+  let wb = wbXml.replace(/<sheets>[\s\S]*?<\/sheets>/, `<sheets>${sheets.join('')}</sheets>`)
+    .replace(/<definedNames>[\s\S]*?<\/definedNames>/, `<definedNames>${names.join('')}</definedNames>`)
+    .replace(/activeTab="\d+"/, 'activeTab="0"').replace(/firstSheet="\d+"/, 'firstSheet="0"');
+  if (!/xmlns:r=/.test(wb.match(/<workbook[^>]*>/)[0])) wb = wb.replace('<workbook ', '<workbook xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
+  zip.file('xl/workbook.xml', wb);
+  zip.file('xl/_rels/workbook.xml.rels', relsXml.replace(/<Relationship [^>]*relationships\/worksheet"[^>]*\/>/g, '').replace('</Relationships>', rels.join('') + '</Relationships>'));
+  zip.file('[Content_Types].xml', ctXml.replace(/<Override PartName="\/xl\/(worksheets\/sheet|drawings\/drawing)\d+\.xml"[^>]*\/>/g, '').replace('</Types>', overrides.join('') + '</Types>'));
+  return zip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+/* PERMIT_FILL_END */
+</script>
+<script>
+(() => {
+  const API_URL = String((window.APP_CONFIG || {}).API_URL || '').trim();
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = {
+    get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { sessionStorage.setItem(k, v); } catch {} },
+    del(k) { try { sessionStorage.removeItem(k); } catch {} },
+  };
+  function saveBlob(blob, filename) {
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  /* 구글 스크립트 호출. 본문은 일반 글자로 보내 사전 확인(preflight) 없이 통과시킨다. */
+  async function api(payload) {
+    if (!API_URL) throw { code: 'no_api' };
+    let res;
+    try { res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), redirect: 'follow' }); }
+    catch (e) { throw { code: 'network' }; }
+    let j;
+    try { j = await res.json(); } catch (e) { throw { code: 'bad_response' }; }
+    if (!j || !j.ok) throw { code: (j && j.error) || 'error', data: j || {} };
+    return j;
+  }
+  function apiMsg(err) {
+    const c = err && err.code;
+    if (c === 'no_api') return '신청 서버가 아직 연결되지 않았습니다. 총무/안전관리팀에 알려 주세요.';
+    if (c === 'network') return '인터넷 연결을 확인하고 다시 눌러 주세요.';
+    if (c === 'rate_limited') return '지금 신청이 몰려 있습니다. 잠시 후 다시 시도해 주세요.';
+    if (c === 'busy') return '접속이 몰려 있습니다. 잠시 후 다시 눌러 주세요.';
+    if (c === 'invalid') return '입력 내용을 다시 확인해 주세요.';
+    if (c === 'not_found') return '접수번호나 연락처가 맞지 않습니다.';
+    if (c === 'locked') return '여러 번 틀려 잠시 막혔습니다. 잠시 후 다시 시도해 주세요.';
+    if (c === 'too_many') return '이 허가서에는 더 이상 연장을 받을 수 없습니다. 안전관리팀에 문의해 주세요.';
+    return '저장하지 못했습니다. 잠시 후 다시 눌러 주세요.';
+  }
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), 2600); }
+  function todayStr() { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+  function fmtDT(iso) { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+  function fmtRange(p) { const f = s => (s || '').slice(5).replace('-', '.'); return p.startDate === p.endDate ? f(p.startDate) : `${f(p.startDate)}~${f(p.endDate)}`; }
+
+  const HAZ_HINT = {
+    confined: '탱크·맨홀·피트 등 산소결핍·유해가스 우려 장소',
+    power: '전원을 차단하고 하는 전기설비 작업',
+    hot: '용접·용단·그라인더 등 불꽃이나 고열이 나는 작업',
+    height: '2m 이상 높이(사다리·고소작업대·지붕) 작업',
+    dig: '땅파기·바닥 파쇄 등 굴착 작업',
+    heavy: '크레인·지게차·굴삭기·고소작업차 투입',
+  };
+
+  /* ---------- tabs ---------- */
+  function show(view) {
+    const admin = view === 'admin';
+    $('viewForm').hidden = admin; $('viewAdmin').hidden = !admin;
+    $('tabForm').setAttribute('aria-selected', String(!admin));
+    $('tabAdmin').setAttribute('aria-selected', String(admin));
+    $('wrap').classList.toggle('wide', admin);
+    $('pageTitle').textContent = admin ? '작업허가 관리' : '작업허가 신청';
+    if (admin) enterAdmin();
+  }
+  $('tabForm').onclick = () => show('form');
+  $('tabAdmin').onclick = () => show('admin');
+
+  /* ---------- build form choices ---------- */
+  $('hazardList').innerHTML = HIGH_TYPES.map(h => `
+    <label class="hz"><input type="checkbox" name="highTypes" value="${h.key}" id="hz_${h.key}"><strong>${h.label}</strong><small>${HAZ_HINT[h.key]}</small></label>`).join('');
+  $('genList').innerHTML = GEN_TYPES.concat([{ key: 'other', label: '기타' }]).map(g => `
+    <label class="chip"><input type="checkbox" name="genTypes" value="${g.key}" id="gt_${g.key}">${g.label}</label>`).join('');
+
+  function readForm() {
+    const f = $('permitForm');
+    const val = id => $(id).value.trim();
+    return {
+      company: val('company'), applicantDept: val('applicantDept'), applicantTitle: val('applicantTitle'), applicantName: val('applicantName'),
+      startDate: val('startDate'), endDate: val('endDate'), workHours: val('workHours'), location: val('location'),
+      workerNames: val('workerNames'), workerPhone: val('workerPhone'), headcount: $('headcount').value ? Number($('headcount').value) : null,
+      highTypes: [...f.querySelectorAll('input[name="highTypes"]:checked')].map(i => i.value),
+      genTypes: [...f.querySelectorAll('input[name="genTypes"]:checked')].map(i => i.value),
+      heavyEquip: val('heavyEquip'), otherType: val('otherType'),
+      description: val('description'), notes: val('notes'),
+      attachments: [...f.querySelectorAll('input[name="attachments"]:checked')].map(i => i.value),
+      procedureDoc: (f.querySelector('input[name="procedureDoc"]:checked') || {}).value || '',
+      changedWork: (f.querySelector('input[name="changedWork"]:checked') || {}).value || '',
+    };
+  }
+
+  function refreshKind() {
+    const p = readForm();
+    const high = p.highTypes.length > 0;
+    const labels = HIGH_TYPES.filter(h => p.highTypes.includes(h.key)).map(h => h.label);
+    const v = $('verdict');
+    v.className = 'verdict ' + (high ? 'high' : 'gen');
+    v.querySelector('.tag').textContent = high ? '고위험작업' : '일반위험작업';
+    $('verdictText').textContent = high ? `허가서로 접수됩니다 (${labels.join('·')}).` : '허가서로 접수됩니다.';
+    $('heavyEquipWrap').hidden = !p.highTypes.includes('heavy');
+    $('heavyEquip').required = p.highTypes.includes('heavy');
+    $('otherTypeWrap').hidden = !p.genTypes.includes('other');
+    const list = high ? ATTACH.high : ATTACH.gen;
+    const kept = new Set(p.attachments);
+    $('attachList').innerHTML = list.map((a, i) => `<label class="chip"><input type="checkbox" name="attachments" value="${esc(a)}" id="att_${i}_${high ? 'h' : 'g'}" ${kept.has(a) ? 'checked' : ''}>${esc(a)}</label>`).join('');
+  }
+  $('permitForm').addEventListener('change', (e) => { if (e.target.name === 'highTypes' || e.target.name === 'genTypes') refreshKind(); });
+  $('startDate').value = todayStr(); $('endDate').value = todayStr();
+  $('startDate').addEventListener('change', () => { if ($('endDate').value < $('startDate').value) $('endDate').value = $('startDate').value; });
+  refreshKind();
+
+  /* ---------- 이 휴대폰에서 신청한 작업 ---------- */
+  const MINE_KEY = 'permit-mine-v1';
+  let mine = [];
+  try { mine = JSON.parse(localStorage.getItem(MINE_KEY) || '[]'); } catch (e) { mine = []; }
+  if (!Array.isArray(mine)) mine = [];
+  const saveMine = () => { try { localStorage.setItem(MINE_KEY, JSON.stringify(mine.slice(0, 30))); } catch (e) {} };
+
+  if (!API_URL) { const n = $('writeNotice'); n.hidden = false; n.textContent = '신청 서버 주소가 설정되지 않았습니다. config.js 의 API_URL 을 확인해 주세요.'; }
+
+  function extList(p) {
+    const x = p.extensions;
+    const arr = Array.isArray(x) ? x : Object.entries(x || {}).map(([id, e]) => ({ id, ...e }));
+    return arr.slice().sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  }
+  function fmtExt(e) { return `${(e.date || '').slice(5).replace('-', '.')} ${e.from || ''}~${e.to || ''}`; }
+
+  function renderMine() {
+    $('mine').hidden = mine.length === 0;
+    $('mineList').innerHTML = mine.slice(0, 10).map(p => {
+      const last = extList(p).slice(-1)[0];
+      return `
+      <li><span><span class="badge ${permitIsHigh(p) ? 'high' : 'gen'}">${permitIsHigh(p) ? '고위험' : '일반'}</span>
+      <strong>${esc(p.location)}</strong> · ${esc((p.description || '').slice(0, 40))}</span>
+      <span class="meta"><span class="mono">${esc(p.id)}</span> <span class="mono">${esc(fmtRange(p))}</span>
+      ${last ? `<span class="badge ext">연장 ${esc(fmtExt(last))}</span>` : ''}
+      <button class="btn small" type="button" data-extpid="${esc(p.id)}">연장 신청</button></span></li>`;
+    }).join('');
+  }
+  function remember(item) {
+    mine = [item].concat(mine.filter(x => x.id !== item.id));
+    saveMine(); renderMine();
+  }
+  renderMine();
+
+  /* ---------- 작업 연장 ---------- */
+  let extPid = null;
+  $('mineList').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-extpid]'); if (!b) return;
+    const p = mine.find(x => x.id === b.dataset.extpid); if (!p) return;
+    extPid = p.id;
+    $('extKv').innerHTML = [['접수번호', p.id], ['업체', p.company], ['작업장소', p.location], ['허가기간', `${p.startDate} ~ ${p.endDate}`], ['작업내용', p.description]]
+      .map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')
+      + extList(p).map(x => `<dt>이전 연장</dt><dd>${esc(fmtExt(x))} · ${esc(x.reason || '')}</dd>`).join('');
+    $('extDate').value = todayStr(); $('extReason').value = ''; $('extErr').textContent = '';
+    $('permitForm').hidden = true; $('doneCard').hidden = true; $('extCard').hidden = false;
+    window.scrollTo({ top: 0 });
+    $('extReason').focus();
+  });
+  function closeExt() { $('extCard').hidden = true; $('permitForm').hidden = false; extPid = null; }
+  $('extCancel').onclick = closeExt;
+  $('extSave').onclick = async () => {
+    const date = $('extDate').value, from = $('extFrom').value, to = $('extTo').value, reason = $('extReason').value.trim();
+    const err = (t) => { $('extErr').textContent = t; };
+    if (!date || !from || !to) return err('연장 일자와 시각을 입력해 주세요.');
+    if (from === to) return err('시작 시각과 종료 시각이 같습니다.');
+    if (!reason) return err('연장 사유를 적어 주세요.');
+    const p = mine.find(x => x.id === extPid); if (!p) return err('작업을 찾지 못했습니다.');
+    const btn = $('extSave'); btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const r = await api({ action: 'extend', id: p.id, phone: p.phone, ext: { date, from, to, reason } });
+      p.extensions = extList(p).concat([{ id: r.extId, date, from, to, reason, createdAt: new Date().toISOString() }]);
+      saveMine(); renderMine(); closeExt();
+      toast('연장 신청을 접수했습니다.');
+    } catch (e2) { err(apiMsg(e2)); }
+    finally { btn.disabled = false; btn.textContent = '연장 신청'; }
+  };
+
+  /* 다른 휴대폰에서 신청한 건을 접수번호+연락처로 불러오기 */
+  $('lookupBtn').onclick = async () => {
+    const id = $('lookupId').value.trim().toUpperCase(), phone = $('lookupPhone').value.trim();
+    const err = (t) => { $('lookupErr').textContent = t; };
+    err('');
+    if (!id || !phone) return err('접수번호와 연락처를 입력해 주세요.');
+    const btn = $('lookupBtn'); btn.disabled = true;
+    try {
+      const r = await api({ action: 'lookup', id, phone });
+      remember({ ...r.permit, phone });
+      $('lookupId').value = ''; $('lookupPhone').value = ''; $('lookupBox').open = false;
+      toast('작업을 찾았습니다. 목록에서 연장 신청을 누르세요.');
+    } catch (e) { err(apiMsg(e)); }
+    finally { btn.disabled = false; }
+  };
+
+  /* ---------- 신청 ---------- */
+  $('permitForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('formErr').textContent = '';
+    const f = $('permitForm');
+    if (!f.checkValidity()) {
+      const bad = f.querySelector(':invalid');
+      const name = bad && bad.closest('label') ? (bad.closest('label').querySelector('span') || {}).textContent : '';
+      $('formErr').textContent = bad && bad.id === 'consent' ? '개인정보 수집에 동의해야 신청할 수 있습니다.' : `필수 항목을 확인해 주세요${name ? ': ' + name.replace('*', '').trim() : ''}.`;
+      if (bad) bad.focus();
+      return;
+    }
+    const p = readForm();
+    if (p.endDate < p.startDate) { $('formErr').textContent = '종료일이 시작일보다 빠릅니다.'; $('endDate').focus(); return; }
+    p.website = $('website').value;
+    const btn = $('submitBtn'); btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const r = await api({ action: 'submit', data: p });
+      remember({ id: r.id, phone: p.workerPhone, company: p.company, location: p.location, startDate: p.startDate, endDate: p.endDate, description: p.description, highTypes: p.highTypes, genTypes: p.genTypes, createdAt: r.createdAt || new Date().toISOString(), extensions: [] });
+      showDone(p, r.id);
+    } catch (err) { $('formErr').textContent = apiMsg(err); }
+    finally { btn.disabled = false; btn.textContent = '작업허가 신청'; }
+  });
+
+  function showDone(p, id) {
+    const high = permitIsHigh(p);
+    $('doneId').textContent = id;
+    $('doneVerdict').innerHTML = `<span class="badge ${high ? 'high' : 'gen'}">${high ? '고위험작업 허가서' : '일반위험작업 허가서'}</span>`;
+    $('doneKv').innerHTML = [
+      ['업체', p.company], ['작업장소', p.location], ['작업기간', `${p.startDate} ~ ${p.endDate}`], ['작업자', `${p.workerNames} (${p.workerPhone})`], ['작업내용', p.description],
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+    $('permitForm').hidden = true; $('doneCard').hidden = false;
+    window.scrollTo({ top: 0 });
+  }
+  $('againBtn').onclick = () => {
+    const f = $('permitForm');
+    ['highTypes', 'genTypes', 'attachments'].forEach(n => f.querySelectorAll(`input[name="${n}"]`).forEach(i => (i.checked = false)));
+    ['description', 'notes', 'location', 'heavyEquip', 'otherType'].forEach(id => ($(id).value = ''));
+    $('consent').checked = false;
+    refreshKind();
+    $('doneCard').hidden = true; f.hidden = false; $('location').focus();
+  };
+
+  /* ---------- admin ---------- */
+  let rows = [], adminState = {}, adminLoaded = false, refreshTimer = null;
+  let kindFilter = 'all', statFilter = 'all', query = '', selected = new Set(), focusKey = null;
+  const PW_KEY = 'permit-admin-pw';
+
+  function adminMsg(err) {
+    const c = err && err.code;
+    if (c === 'wrong_password') { const left = err.data && err.data.left; return '비밀번호가 맞지 않습니다.' + (left != null ? ` (${left}번 남음)` : ''); }
+    if (c === 'locked') return `비밀번호를 여러 번 틀려 ${(err.data && err.data.minutes) || 10}분 동안 막혔습니다. 잠시 후 다시 시도해 주세요.`;
+    if (c === 'not_configured') return '관리자 비밀번호가 아직 설정되지 않았습니다. 구글 스크립트의 ADMIN_PASSWORD 를 입력해 주세요.';
+    return apiMsg(err);
+  }
+  function applyList(r) {
+    const extBy = {};
+    (r.extensions || []).forEach(x => { (extBy[x.permitId] = extBy[x.permitId] || {})[x.id] = { date: x.date, from: x.from, to: x.to, reason: x.reason, createdAt: x.createdAt }; });
+    rows = (r.permits || []).map(x => ({ ...x.data, id: x.id, key: x.id, createdAt: x.createdAt, extensions: extBy[x.id] || {} }));
+    adminState = {}; (r.permits || []).forEach(x => { adminState[x.id] = x.state || {}; });
+    renderAdmin();
+  }
+  async function loadAdmin(pw, silent) {
+    try { applyList(await api({ action: 'list', password: pw })); adminLoaded = true; return true; }
+    catch (err) {
+      adminLoaded = false;
+      if (['wrong_password', 'locked', 'not_configured'].includes(err.code)) store.del(PW_KEY);
+      if (!silent) $('pinErr').textContent = adminMsg(err);
+      return false;
+    }
+  }
+  async function enterAdmin() {
+    const pw = store.get(PW_KEY);
+    if (pw && !adminLoaded) await loadAdmin(pw, true);
+    $('gate').hidden = adminLoaded; $('desk').hidden = !adminLoaded;
+    if (adminLoaded) {
+      drawQR();
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(() => { const p = store.get(PW_KEY); if (p && !$('viewAdmin').hidden && !document.hidden) loadAdmin(p, true); }, 30000);
+    } else setTimeout(() => $('pin').focus(), 0);
+  }
+  async function tryPin() {
+    const pw = $('pin').value; if (!pw) return;
+    $('pinErr').textContent = ''; $('pinBtn').disabled = true;
+    if (await loadAdmin(pw, false)) { store.set(PW_KEY, pw); $('pin').value = ''; enterAdmin(); }
+    else $('pin').select();
+    $('pinBtn').disabled = false;
+  }
+  $('pinBtn').onclick = tryPin;
+  $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') tryPin(); });
+  $('lockBtn').onclick = () => { store.del(PW_KEY); adminLoaded = false; rows = []; adminState = {}; clearInterval(refreshTimer); enterAdmin(); };
+  $('refreshBtn').onclick = async () => { const ok = await loadAdmin(store.get(PW_KEY) || '', true); toast(ok ? '목록을 새로 불러왔습니다.' : '불러오지 못했습니다.'); if (!ok) enterAdmin(); };
+
+  function mergeState(old, patch) {
+    const s = { ...(old || {}), ...patch };
+    if (patch.extDone) s.extDone = { ...((old || {}).extDone || {}), ...patch.extDone };
+    if ('override' in patch && !patch.override) delete s.override;
+    return s;
+  }
+  async function patchEach(pairs) {
+    pairs.forEach(([k, patch]) => { adminState[k] = mergeState(adminState[k], patch); });
+    renderAdmin();
+    try { await api({ action: 'patch', password: store.get(PW_KEY) || '', items: pairs.map(([id, patch]) => ({ id, patch })) }); }
+    catch (err) { toast('저장하지 못했습니다. 새로고침 후 다시 확인해 주세요.'); }
+  }
+  const patchState = (key, patch) => patchEach([[key, patch]]);
+  const withState = (r) => ({ ...r, ...(adminState[r.key] || {}) });
+  const pendingExt = (r) => extList(r).filter(e => !(r.extDone || {})[e.id]);
+
+  function visibleRows() {
+    const q = query.toLowerCase();
+    return rows.map(withState).filter(r => !r.hidden)
+      .filter(r => kindFilter === 'all' || (kindFilter === 'high') === permitIsHigh(r))
+      .filter(r => statFilter === 'all' || (statFilter === 'ext' ? pendingExt(r).length > 0 : (statFilter === 'printed') === !!r.printed))
+      .filter(r => !q || [r.company, r.location, r.workerNames, r.description, r.applicantName].join(' ').toLowerCase().includes(q))
+      .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  }
+
+  function renderAdmin() {
+    const all = rows.map(withState).filter(r => !r.hidden);
+    $('sAll').textContent = all.length;
+    $('sHigh').textContent = all.filter(permitIsHigh).length;
+    $('sGen').textContent = all.filter(r => !permitIsHigh(r)).length;
+    $('sTodo').textContent = all.filter(r => !r.printed).length;
+    const vis = visibleRows();
+    const live = new Set(all.map(r => r.key));
+    selected.forEach(k => { if (!live.has(k)) selected.delete(k); });
+    $('rows').innerHTML = vis.map(r => {
+      const high = permitIsHigh(r);
+      return `<tr data-key="${esc(r.key)}" class="${r.key === focusKey ? 'sel' : ''}">
+        <td><input type="checkbox" data-pick="${esc(r.key)}" ${selected.has(r.key) ? 'checked' : ''} aria-label="선택"></td>
+        <td class="mono">${esc(fmtDT(r.createdAt))}</td>
+        <td><span class="badge ${high ? 'high' : 'gen'}">${high ? '고위험' : '일반'}</span></td>
+        <td>${esc(r.company)}</td><td>${esc(r.location)}</td>
+        <td class="mono">${esc(fmtRange(r))}</td>
+        <td class="desc">${esc(r.description)}</td>
+        <td>${r.printed ? '<span class="badge printed">출력완료</span>' : '<span class="badge new">미출력</span>'}${pendingExt(r).length ? ' <span class="badge ext">연장 신청</span>' : ''}</td></tr>`;
+    }).join('');
+    $('emptyRows').hidden = vis.length > 0;
+    if (all.length > 0 && vis.length === 0) $('emptyRows').hidden = false;
+    $('emptyRows').innerHTML = all.length === 0 ? '아직 접수된 작업허가 신청이 없습니다.<br>작업자가 QR 코드로 신청하면 여기에 쌓입니다.' : '조건에 맞는 신청이 없습니다.';
+    $('checkAll').checked = vis.length > 0 && vis.every(r => selected.has(r.key));
+    $('xlsxBtn').disabled = selected.size === 0;
+    $('xlsxBtn').textContent = `선택 ${selected.size}건 엑셀 받기`;
+    renderDetail();
+  }
+
+  $('rows').addEventListener('click', (e) => {
+    const pick = e.target.closest('input[data-pick]');
+    if (pick) { pick.checked ? selected.add(pick.dataset.pick) : selected.delete(pick.dataset.pick); renderAdmin(); return; }
+    const tr = e.target.closest('tr[data-key]');
+    if (tr) { focusKey = tr.dataset.key; renderAdmin(); }
+  });
+  $('checkAll').addEventListener('change', (e) => { visibleRows().forEach(r => (e.target.checked ? selected.add(r.key) : selected.delete(r.key))); renderAdmin(); });
+  $('q').addEventListener('input', (e) => { query = e.target.value.trim(); renderAdmin(); });
+  function segment(id, setter) {
+    $(id).addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-v]'); if (!b) return;
+      $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      setter(b.dataset.v); renderAdmin();
+    });
+  }
+  segment('kindSeg', v => (kindFilter = v));
+  segment('statSeg', v => (statFilter = v));
+
+  function renderDetail() {
+    const box = $('detail');
+    const r = rows.map(withState).find(x => x.key === focusKey && !x.hidden);
+    if (!r) { box.hidden = true; $('qrPanel').hidden = false; return; }
+    box.hidden = false; $('qrPanel').hidden = true;
+    const high = permitIsHigh(r);
+    const auto = (r.highTypes || []).length > 0;
+    const hz = HIGH_TYPES.filter(h => (r.highTypes || []).includes(h.key)).map(h => h.label).join(', ') || '없음';
+    const gen = GEN_TYPES.concat([{ key: 'other', label: '기타' + (r.otherType ? `(${r.otherType})` : '') }]).filter(g => (r.genTypes || []).includes(g.key)).map(g => g.label).join(', ') || '-';
+    box.innerHTML = `
+      <div class="row" style="justify-content:space-between"><h2>${esc(r.company)}</h2><button class="btn small" type="button" data-act="close">목록 QR 보기</button></div>
+      <div class="row"><span class="badge ${high ? 'high' : 'gen'}">${high ? '고위험작업 허가서' : '일반위험작업 허가서'}</span>
+        ${r.printed ? '<span class="badge printed">출력완료</span>' : '<span class="badge new">미출력</span>'}</div>
+      <dl class="kv">
+        <dt>접수</dt><dd class="mono">${esc(fmtDT(r.createdAt))}</dd>
+        <dt>신청인</dt><dd>${esc([r.applicantDept, r.applicantTitle, r.applicantName].filter(Boolean).join(' / '))}</dd>
+        <dt>작업기간</dt><dd>${esc(r.startDate)} ~ ${esc(r.endDate)} ${r.workHours ? '(' + esc(r.workHours) + ')' : ''}</dd>
+        <dt>작업장소</dt><dd>${esc(r.location)}</dd>
+        <dt>작업자</dt><dd>${esc(r.workerNames)}${r.headcount ? ' · ' + r.headcount + '명' : ''}<br><span class="mono">${esc(r.workerPhone)}</span></dd>
+        <dt>고위험 항목</dt><dd>${esc(hz)}${r.heavyEquip ? '<br>장비: ' + esc(r.heavyEquip) : ''}</dd>
+        <dt>일반 구분</dt><dd>${esc(gen)}</dd>
+        <dt>작업내용</dt><dd>${esc(r.description)}</dd>
+        <dt>첨부서류</dt><dd>${esc((r.attachments || []).join(', ') || '-')}</dd>
+        <dt>절차서/변경</dt><dd>${esc(r.procedureDoc || '-')} / ${esc(r.changedWork || '-')}</dd>
+        ${r.notes ? `<dt>기타</dt><dd>${esc(r.notes)}</dd>` : ''}
+      </dl>
+      ${extList(r).length ? `<div class="field"><span>작업 연장</span><ul class="extlist">${extList(r).map(x => `
+        <li><span><span class="mono">${esc(fmtExt(x))}</span> · ${esc(x.reason || '')}</span>
+        <span class="meta">${(r.extDone || {})[x.id] ? '<span class="badge printed">출력완료</span>' : '<span class="badge ext">연장 신청</span>'}
+        <button class="btn small" type="button" data-act="ext" data-eid="${esc(x.id)}">이 연장으로 엑셀</button></span></li>`).join('')}</ul></div>` : ''}
+      <label class="field"><span>허가서 양식</span>
+        <select id="ovr">
+          <option value="" ${!r.override ? 'selected' : ''}>자동 (${auto ? '고위험' : '일반'})</option>
+          <option value="high" ${r.override === 'high' ? 'selected' : ''}>고위험작업 허가서로 변경</option>
+          <option value="gen" ${r.override === 'gen' ? 'selected' : ''}>일반위험작업 허가서로 변경</option>
+        </select></label>
+      <div class="row">
+        <button class="btn small primary" type="button" data-act="one">이 건만 엑셀 받기</button>
+        <button class="btn small" type="button" data-act="printed">${r.printed ? '미출력으로 되돌리기' : '출력완료 표시'}</button>
+        <button class="btn small danger" type="button" data-act="hide">목록에서 삭제</button>
+      </div>
+      <div class="row" id="hideConfirm" hidden><span class="hint">목록에서 지울까요?</span><button class="btn small danger" type="button" data-act="hideYes">삭제</button><button class="btn small" type="button" data-act="hideNo">취소</button></div>`;
+  }
+  $('detail').addEventListener('change', (e) => { if (e.target.id === 'ovr') patchState(focusKey, { override: e.target.value || null }); });
+  $('detail').addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const r = rows.map(withState).find(x => x.key === focusKey); if (!r) return;
+    const act = b.dataset.act;
+    if (act === 'close') { focusKey = null; renderAdmin(); }
+    if (act === 'one') exportRows([r]);
+    if (act === 'ext') { const x = extList(r).find(y => y.id === b.dataset.eid); if (x) exportRows([{ ...r, extension: x }]); }
+    if (act === 'printed') patchState(r.key, { printed: !r.printed });
+    if (act === 'hide') $('hideConfirm').hidden = false;
+    if (act === 'hideNo') $('hideConfirm').hidden = true;
+    if (act === 'hideYes') { await patchState(r.key, { hidden: true }); selected.delete(r.key); focusKey = null; toast('목록에서 삭제했습니다.'); renderAdmin(); }
+  });
+
+  $('xlsxBtn').onclick = () => exportRows(rows.map(withState).filter(r => selected.has(r.key) && !r.hidden));
+
+  let templateBuf = null;
+  async function exportRows(list) {
+    if (!list.length) return;
+    if (!window.JSZip) { toast('엑셀 도구를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.'); return; }
+    const btn = $('xlsxBtn'); const label = btn.textContent; btn.disabled = true; btn.textContent = '엑셀 만드는 중…';
+    try {
+      if (!templateBuf) { const res = await fetch('template.xlsx'); if (!res.ok) throw new Error('template'); templateBuf = await res.arrayBuffer(); }
+      const sorted = list.map(r => {
+        if (r.extension) return r;
+        const pend = pendingExt(r), all = extList(r);
+        const x = pend[pend.length - 1] || all[all.length - 1];
+        return x ? { ...r, extension: x } : r;
+      }).sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
+      const out = await buildPermitWorkbook(null, templateBuf.slice(0), sorted);
+      const nH = sorted.filter(permitIsHigh).length, nG = sorted.length - nH;
+      const fname = `작업허가서_${todayStr().replace(/-/g, '')}_고위험${nH}_일반${nG}.xlsx`;
+      saveBlob(new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fname);
+      await patchEach(sorted.map(r => [r.key, r.extension ? { printed: true, extDone: { [r.extension.id]: true } } : { printed: true }]));
+      toast(`${sorted.length}건을 엑셀로 저장했습니다.`);
+    } catch (err) {
+      toast('엑셀을 만들지 못했습니다. 다시 시도해 주세요.');
+    } finally { btn.textContent = label; renderAdmin(); }
+  }
+
+  /* ---------- QR ---------- */
+  const workerUrl = /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, '') : '';
+  let qrDrawn = false;
+  function drawQR() {
+    if (qrDrawn) return;
+    $('qrUrl').textContent = workerUrl || '(인터넷 주소로 열면 QR 코드가 만들어집니다)';
+    if (!workerUrl || !window.QRCode) return;
+    qrDrawn = true;
+    new QRCode($('qr'), { text: workerUrl, width: 360, height: 360, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  }
+  $('qrSave').onclick = async () => {
+    const c = $('qr').querySelector('canvas'); if (!c) return;
+    const poster = document.createElement('canvas'); poster.width = 600; poster.height = 760;
+    const g = poster.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0, 0, 600, 760);
+    g.fillStyle = '#111111'; g.textAlign = 'center';
+    g.font = 'bold 40px "IBM Plex Sans KR", "Malgun Gothic", sans-serif'; g.fillText('작업허가 신청', 300, 78);
+    g.font = '22px "IBM Plex Sans KR", "Malgun Gothic", sans-serif'; g.fillText('작업 전 QR 코드로 신청해 주세요', 300, 118);
+    g.drawImage(c, 120, 150, 360, 360);
+    g.font = '20px "IBM Plex Sans KR", "Malgun Gothic", sans-serif'; g.fillText('㈜서진캠 평택공장 · 총무/안전관리팀', 300, 580);
+    g.fillStyle = '#f2c230'; for (let x = -40; x < 640; x += 40) { g.beginPath(); g.moveTo(x, 760); g.lineTo(x + 20, 760); g.lineTo(x + 50, 720); g.lineTo(x + 30, 720); g.fill(); }
+    poster.toBlob((blob) => { if (blob) saveBlob(blob, '작업허가신청_QR.png'); else toast('QR 이미지를 저장하지 못했습니다.'); }, 'image/png');
+  };
+  $('urlCopy').onclick = () => {
+    if (!workerUrl) return;
+    navigator.clipboard.writeText(workerUrl).then(() => toast('링크를 복사했습니다.')).catch(() => {
+      const r = document.createRange(); r.selectNodeContents($('qrUrl')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('링크를 선택했습니다. 복사해 주세요.');
+    });
+  };
+
+  if (location.hash === '#admin') show('admin');
+})();
+</script>
+</body>
+</html>
